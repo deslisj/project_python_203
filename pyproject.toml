@@ -22,3 +22,4 @@ version_variable = "pyproject.toml:version"
 version_toml = [
 "pyproject.toml:tool.poetry.version",
 ]
+branches = ["main", "branch1"]
