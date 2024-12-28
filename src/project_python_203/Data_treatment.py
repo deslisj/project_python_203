@@ -17,7 +17,7 @@ from pybacktestchain.data_module import DataModule
 class Data_treatment:
     data: pd.DataFrame
 
-    def compute_moving_average(self, short_window=5, long_window=20):
+    def compute_moving_average(self, short_window=50, long_window=200):
             """
             Computes short-term and long-term moving averages for each ticker.
 
@@ -26,21 +26,95 @@ class Data_treatment:
                 long_window (int): Window size for long-term moving average.
 
             Returns:
-                pd.DataFrame: Original DataFrame with two new columns ['Short_MA', 'Long_MA'].
+                pd.DataFrame: a new DataFrame with two new columns and ['Short_MA', 'Long_MA'].
             """
-            # Ensure the data is sorted by 'ticker' and 'Date'
+            # we check that the data is sorted by 'ticker' and 'Date'
             self.data = self.data.sort_values(by=['ticker', 'Date'])
 
-            # Group by 'ticker' and apply rolling window to compute moving averages
+            # we group by 'ticker' and apply rolling window to compute moving averages
             self.data['Short_MA'] = self.data.groupby('ticker')['Adj Close'].transform(
-                lambda x: x.rolling(window=short_window, min_periods=1).mean()
-            )
+                lambda x: x.rolling(window=short_window).mean()) # if we don't want Nan, put : ,min_periods=1 
             
             self.data['Long_MA'] = self.data.groupby('ticker')['Adj Close'].transform(
-                lambda x: x.rolling(window=long_window, min_periods=1).mean()
-            )
+                lambda x: x.rolling(window=long_window).mean()) # if we don't want Nan, put : ,min_periods=1 
+            
+            # we return the new DataFrame with selected columns (keep only relevant columns)
+            return self.data[['Date', 'Adj Close', 'Volume', 'ticker', 'Short_MA', 'Long_MA']]
 
-            return self.data
+    def plot_moving_average(self, ticker):
+        """
+        Plots the adjusted close prices and moving averages for a specific ticker.
 
+        Parameters:
+            ticker (str): The ticker symbol to filter and plot.
 
+        Returns:
+            None: Displays the plot.
+        """
+        # we filter the data for the selected ticker
+        ticker_data = self.data[self.data['ticker'] == ticker]
+
+        # we plot the adjusted close prices and moving averages
+        plt.figure(figsize=(12, 6))
+        plt.plot(ticker_data['Date'], ticker_data['Adj Close'], label='Adj Close', linewidth=1)
+        plt.plot(ticker_data['Date'], ticker_data['Short_MA'], label='Short-Term MA', linewidth=1)
+        plt.plot(ticker_data['Date'], ticker_data['Long_MA'], label='Long-Term MA', linewidth=1)
+
+        # Add labels, legend, and title
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.title(f'Moving Averages for {ticker}')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
+
+@dataclass
+class TradingStrategy:
+    data_MA: pd.DataFrame # data with moving averages computed with the Data_treatment class
+
+    def compute_trading_signals(self):
+        """
+        Computes trading signals based on short-term and long-term moving averages.
+
+        Returns:
+            pd.DataFrame: DataFrame with additional 'Signal' and 'Position' columns.
+        """
+        self.data_MA['Signal'] = 0
+        self.data_MA['Signal'] = (self.data_MA['Short_MA'] > self.data_MA['Long_MA']).astype(int)
+        self.data_MA['Position'] = self.data_MA['Signal'].diff()
+        return self.data_MA
+
+    def plot_trading_signals(self, ticker):
+        """
+        Plots the trading signals on the price and moving average chart for a specific ticker.
+
+        Parameters:
+            ticker (str): The ticker symbol to filter and plot.
+
+        Returns:
+            None: Displays the plot.
+        """
+        # Filter data for the selected ticker
+        ticker_data = self.data_MA[self.data_MA['ticker'] == ticker]
+
+        # Plot adjusted close prices and moving averages
+        plt.figure(figsize=(12, 6))
+        plt.plot(ticker_data['Date'], ticker_data['Adj Close'], label='Adj Close', linewidth=1)
+        plt.plot(ticker_data['Date'], ticker_data['Short_MA'], label='Short-Term MA', linewidth=1)
+        plt.plot(ticker_data['Date'], ticker_data['Long_MA'], label='Long-Term MA', linewidth=1)
+
+        # Plot buy and sell signals
+        buy_signals = ticker_data[ticker_data['Position'] == 1]
+        sell_signals = ticker_data[ticker_data['Position'] == -1]
+
+        plt.scatter(buy_signals['Date'], buy_signals['Adj Close'], label='Buy Signal', marker='^', color='green', s=100)
+        plt.scatter(sell_signals['Date'], sell_signals['Adj Close'], label='Sell Signal', marker='v', color='red', s=100)
+
+        # Add labels, legend, and title
+        plt.xlabel('Date')
+        plt.ylabel('Price')
+        plt.title(f'Trading Signals for {ticker}')
+        plt.legend()
+        plt.grid(True)
+        plt.show()
 
