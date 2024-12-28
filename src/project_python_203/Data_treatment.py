@@ -79,9 +79,16 @@ class TradingStrategy:
         Returns:
             pd.DataFrame: DataFrame with additional 'Signal' and 'Position' columns.
         """
+        # we compute the Signal column
         self.data_MA['Signal'] = 0
         self.data_MA['Signal'] = (self.data_MA['Short_MA'] > self.data_MA['Long_MA']).astype(int)
-        self.data_MA['Position'] = self.data_MA['Signal'].diff()
+
+        # we compute the Position column within each ticker group
+        self.data_MA['Position'] = self.data_MA.groupby('ticker')['Signal'].diff()
+
+        # Drop rows where 'Position' is NaN (delete the observation for each ticker)
+        self.data_MA = self.data_MA.dropna(subset=['Position']).reset_index(drop=True)
+
         return self.data_MA
 
     def plot_trading_signals(self, ticker):
@@ -116,5 +123,5 @@ class TradingStrategy:
         plt.title(f'Trading Signals for {ticker}')
         plt.legend()
         plt.grid(True)
-        plt.show()
+        plt.show() 
 
