@@ -1,7 +1,8 @@
 import yfinance as yf
 import pandas as pd 
 from sec_cik_mapper import StockMapper
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import List
 from datetime import datetime, timedelta
 import logging 
 from scipy.optimize import minimize
@@ -50,10 +51,6 @@ class Trades:
             # we get the portfolio value for the selected date
             portfolio_value = self.broker.get_portfolio_value(market_prices=market_val)
             
-            """ to delete
-            print("date", date, "portolio value", portfolio_value)
-            """
-
             for ticker in data_MA['ticker'].unique():
                 ticker_data = data_MA[data_MA['ticker'] == ticker]
                 if ticker_data.empty:
@@ -83,16 +80,58 @@ class Trades:
                         self.broker.sell(ticker, quantity, price, date)
             
             portfolio_values.append({'Date': date, 'Portfolio Value': portfolio_value})
+        
+        output_trades = self.broker.transaction_log
 
-            #print("date", date,"positions : ", self.broker.positions,"\nportolio value", portfolio_value)
-            
+        portfolio_values = pd.DataFrame(portfolio_values)
+        
+        return output_trades, portfolio_values
 
-            """ to delete
-            portfolio_value = self.broker.get_portfolio_value(market_prices=market_val)
-            print("date", date, "portolio value", portfolio_value)
-            """
 
-        """ To use for backtesting"""
+@dataclass
+class MyBacktest:
+    initial_date: datetime
+    final_date: datetime
+    universe: List[str] = field(default_factory=lambda: ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA', 'INTC', 'CSCO', 'NFLX'])
+    initial_cash: int = 1000000  # Initial cash in the portfolio
+    verbose: bool = True
+    broker = Broker(cash=initial_cash, verbose=verbose)
+    short_window: int = 20
+    long_window: int = 100
+    
+    def run_backtest(self):
+        """
+        Run the backtest from the initial to the final date.
+
+        Returns:
+            pd.DataFrame: A DataFrame of executed trades for all dates.
+        """
+        logging.info(f"Running backtest from {self.initial_date} to {self.final_date}.")
+        logging.info(f"Retrieving price data for universe")
+
+        # Get the data for the backtest period
+        data = get_stocks_data(self.universe, self.initial_date, self.final_date)
+
+        #Data_treatment
+        data_treatment = Data_treatment(data)
+
+        # Compute moving averages
+        data_MA = data_treatment.compute_moving_average(short_window=self.short_window, long_window=self.long_window)
+        
+        # Trading strategy based on moving averages 
+        Trading_strat = TradingStrategy(data_MA)
+
+        # Compute trading signals
+        signals = Trading_strat.compute_trading_signals()
+
+        # Execute trades
+        trades = Trades(Trading_strat, self.broker)
+
+        # Execute trades based on signals
+        output_trades, portfolio_values = trades.execute_trades(signals)
+
+        logging.info(f"Backtest completed. Final portfolio value: {portfolio_values.iloc[-1]['Portfolio Value']}")
+
         # Return a DataFrame of the executed trades
         # create backtests folder if it does not exist
         if not os.path.exists('backtests'):
@@ -100,12 +139,9 @@ class Trades:
 
         # save to csv, use the backtest name 
         backtest_name = generate_random_name()
-        
-        output_trades = self.broker.transaction_log
-        
+
         output_trades.to_csv(f"backtests/{backtest_name}.csv")
 
-        portfolio_values = pd.DataFrame(portfolio_values)
-        
         return output_trades, portfolio_values
-
+        
+        
