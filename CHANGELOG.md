@@ -4,16 +4,16 @@
 
 ## v0.4.0 (10-01-2025)
 ### Features
-* feat: add test_Trades [`c9e26dd`](https://github.com/deslisj/project_python_203/commit/c9e26ddfaf2dec71cf781d2b95410835609ff8c1)
-* feat : add test_import [`bc74804`](https://github.com/deslisj/project_python_203/commit/bc74804298164c211a23fdf93bb96aeece6da255)
-* feat : add test_Data_Treatment [`028bd3d`](https://github.com/deslisj/project_python_203/commit/028bd3d3d93ae7e31ad3dd0818dac178b7303a6a)
-* feat : add Readme [`dc5230d`](https://github.com/deslisj/project_python_203/commit/dc5230d959895cca220f86ef17a92de4d7d15a0c)
+* feat: add test_Trades ([`c9e26dd`](https://github.com/deslisj/project_python_203/commit/c9e26ddfaf2dec71cf781d2b95410835609ff8c1))
+* feat : add test_import ([`bc74804`](https://github.com/deslisj/project_python_203/commit/bc74804298164c211a23fdf93bb96aeece6da255))
+* feat : add test_Data_Treatment ([`028bd3d`](https://github.com/deslisj/project_python_203/commit/028bd3d3d93ae7e31ad3dd0818dac178b7303a6a))
+* feat : add Readme ([`dc5230d`](https://github.com/deslisj/project_python_203/commit/dc5230d959895cca220f86ef17a92de4d7d15a0c))
 
 ### Fix
-* fix : trades modification (inclusion of the type of MA) [`a4d46a6`](https://github.com/deslisj/project_python_203/commit/a4d46a63471cb7857350b301242cbf2be1ac66cd)
-* fix : small changes in Data_treatment [`f58673a`](https://github.com/deslisj/project_python_203/commit/f58673af3d6957278c4af05b6ce6b1a4ac482373)
-* fix : modification of Example_of_Usage [`a8c93c0`](https://github.com/deslisj/project_python_203/commit/a8c93c04608e32aaad24dbc39ca53514870d28c7)
-* modification of files My_workings_project_203 deleted [`dad61e9`](https://github.com/deslisj/project_python_203/commit/dad61e9655ac0b944111701ce8fdb0d93e884118)
+* fix : trades modification (inclusion of the type of MA) ([`a4d46a6`](https://github.com/deslisj/project_python_203/commit/a4d46a63471cb7857350b301242cbf2be1ac66cd))
+* fix : small changes in Data_treatment ([`f58673a`](https://github.com/deslisj/project_python_203/commit/f58673af3d6957278c4af05b6ce6b1a4ac482373))
+* fix : modification of Example_of_Usage ([`a8c93c0`](https://github.com/deslisj/project_python_203/commit/a8c93c04608e32aaad24dbc39ca53514870d28c7))
+* modification of files My_workings_project_203 deleted ([`dad61e9`](https://github.com/deslisj/project_python_203/commit/dad61e9655ac0b944111701ce8fdb0d93e884118))
 
 ## v0.3.0 (02-01-2025)
 
