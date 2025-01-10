@@ -10,7 +10,10 @@ $ pip install project_python_203
 
 ## Usage
 
-- TODO
+- This package is an extenstion of the `pybacktestchain` package. 
+- This package enables to compute the simple or exponential moving averages on several stocks.
+- It also allows to plot the moving averages and the stock prices.
+- The package then enables to simulate the trading strategy based on the moving averages and to run backtests. 
 
 ## Contributing
 
