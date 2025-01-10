@@ -17,29 +17,55 @@ from pybacktestchain.data_module import DataModule
 class Data_treatment:
     data: pd.DataFrame
 
-    def compute_moving_average(self, short_window=50, long_window=200):
-            """
-            Computes short-term and long-term moving averages for each ticker.
+    def compute_moving_average(self, short_window=50, long_window=200, short_type='simple', long_type='simple'):
+        """
+        Computes short-term and long-term moving averages for each ticker.
 
-            Parameters:
-                short_window (int): Window size for short-term moving average.
-                long_window (int): Window size for long-term moving average.
+        Parameters:
+            short_window (int): Window size for short-term moving average.
+            long_window (int): Window size for long-term moving average.
+            short_type (str): Type of short-term moving average ('simple' or 'exponential').
+            long_type (str): Type of long-term moving average ('simple' or 'exponential').
 
-            Returns:
-                pd.DataFrame: a new DataFrame with two new columns and ['Short_MA', 'Long_MA'].
-            """
-            # we check that the data is sorted by 'ticker' and 'Date'
-            self.data = self.data.sort_values(by=['ticker', 'Date'])
+        Returns:
+            pd.DataFrame: a new DataFrame with two new columns ['Short_MA', 'Long_MA'].
+        """
+        
+        print("Computing moving averages...")
 
+        # we check that the data is sorted by 'ticker' and 'Date'
+        self.data = self.data.sort_values(by=['ticker', 'Date'])
+
+        # Compute short-term moving average
+        if short_type == 'simple':
             # we group by 'ticker' and apply rolling window to compute moving averages
             self.data['Short_MA'] = self.data.groupby('ticker')['Adj Close'].transform(
-                lambda x: x.rolling(window=short_window).mean()) # if we don't want Nan, put : ,min_periods=1 
-            
+                lambda x: x.rolling(window=short_window).mean() # if we don't want Nan, put : ,min_periods=1 
+            )
+        elif short_type == 'exponential':
+            # we group by 'ticker' and apply exponential weighted moving to compute moving averages
+            self.data['Short_MA'] = self.data.groupby('ticker')['Adj Close'].transform(
+                lambda x: x.ewm(span=short_window, adjust=False).mean() # if we don't want Nan, put : ,min_periods=1 
+            )
+        else:
+            raise ValueError("Invalid short_type. Choose 'simple' or 'exponential'.")
+
+        # Compute long-term moving average
+        if long_type == 'simple':
+            # we group by 'ticker' and apply rolling window to compute moving averages
             self.data['Long_MA'] = self.data.groupby('ticker')['Adj Close'].transform(
-                lambda x: x.rolling(window=long_window).mean()) # if we don't want Nan, put : ,min_periods=1 
-            
-            # we return the new DataFrame with selected columns (keep only relevant columns)
-            return self.data[['Date', 'Adj Close', 'Volume', 'ticker', 'Short_MA', 'Long_MA']]
+                lambda x: x.rolling(window=long_window).mean() # if we don't want Nan, put : ,min_periods=1 
+            )
+        elif long_type == 'exponential':
+            # we group by 'ticker' and apply exponential weighted moving to compute moving averages
+            self.data['Long_MA'] = self.data.groupby('ticker')['Adj Close'].transform(
+                lambda x: x.ewm(span=long_window, adjust=False).mean() # if we don't want Nan, put : ,min_periods=1 
+            )
+        else:
+            raise ValueError("Invalid long_type. Choose 'simple' or 'exponential'.")
+        
+        # we return the new DataFrame with selected columns (keep only relevant columns)
+        return self.data[['Date', 'Adj Close', 'Volume', 'ticker', 'Short_MA', 'Long_MA']]
 
     def plot_moving_average(self, ticker):
         """
