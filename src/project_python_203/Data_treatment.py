@@ -30,8 +30,6 @@ class Data_treatment:
         Returns:
             pd.DataFrame: a new DataFrame with two new columns ['Short_MA', 'Long_MA'].
         """
-        
-        print("Computing moving averages...")
 
         # we check that the data is sorted by 'ticker' and 'Date'
         self.data = self.data.sort_values(by=['ticker', 'Date'])
