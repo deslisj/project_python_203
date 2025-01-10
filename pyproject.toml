@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "project_python_203"
-version = "0.0.0"
+version = "0.3.0"
 description = "Project Python master 203"
 authors = ["Jean Deslis"]
 license = "MIT"
