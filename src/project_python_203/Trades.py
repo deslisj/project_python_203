@@ -98,6 +98,8 @@ class MyBacktest:
     broker = Broker(cash=initial_cash, verbose=verbose)
     short_window: int = 20
     long_window: int = 100
+    short_type: str = 'simple'
+    long_type: str = 'simple'
     
     def run_backtest(self):
         """
@@ -116,7 +118,10 @@ class MyBacktest:
         data_treatment = Data_treatment(data)
 
         # Compute moving averages
-        data_MA = data_treatment.compute_moving_average(short_window=self.short_window, long_window=self.long_window)
+        data_MA = data_treatment.compute_moving_average(
+            short_window=self.short_window, long_window=self.long_window, 
+            short_type=self.short_type, long_type=self.long_type
+            )
         
         # Trading strategy based on moving averages 
         Trading_strat = TradingStrategy(data_MA)
