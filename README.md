@@ -14,7 +14,7 @@ $ pip install project_python_203
 - This package enables to compute the simple or exponential moving averages on several stocks.
 - It also allows to plot the moving averages and the stock prices.
 - The package then enables to simulate the trading strategy based on the moving averages and to run backtests.
-- There is a file named 'example_of_usage' that gives an application of the package
+- There is a file named `example_of_usage` that gives an application of the package
 
 ## Contributing
 
